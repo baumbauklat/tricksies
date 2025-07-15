@@ -252,79 +252,18 @@
     </div>
 
     <script>
-        let audioContext;
-        let oscillator;
-        let gainNode;
-
-        // Initialize audio context
+        // Initialize audio
         function initAudio() {
             try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const audio = new Audio('sound.mp3');
+                audio.loop = true;
+                audio.volume = 0.8;
+                audio.play().catch(error => {
+                    console.log('Audio playback failed:', error);
+                });
                 
-                // Create multiple oscillators for layered scary sound
-                const osc1 = audioContext.createOscillator();
-                const osc2 = audioContext.createOscillator();
-                const osc3 = audioContext.createOscillator();
-                
-                const gain1 = audioContext.createGain();
-                const gain2 = audioContext.createGain();
-                const gain3 = audioContext.createGain();
-                const masterGain = audioContext.createGain();
-                
-                // Connect oscillators to gains
-                osc1.connect(gain1);
-                osc2.connect(gain2);
-                osc3.connect(gain3);
-                
-                gain1.connect(masterGain);
-                gain2.connect(masterGain);
-                gain3.connect(masterGain);
-                masterGain.connect(audioContext.destination);
-                
-                // Low frequency rumble
-                osc1.frequency.setValueAtTime(80, audioContext.currentTime);
-                osc1.type = 'sawtooth';
-                gain1.gain.setValueAtTime(0.3, audioContext.currentTime);
-                
-                // Mid frequency alarm
-                osc2.frequency.setValueAtTime(440, audioContext.currentTime);
-                osc2.type = 'square';
-                gain2.gain.setValueAtTime(0.25, audioContext.currentTime);
-                
-                // High frequency screech
-                osc3.frequency.setValueAtTime(1200, audioContext.currentTime);
-                osc3.type = 'triangle';
-                gain3.gain.setValueAtTime(0.15, audioContext.currentTime);
-                
-                // Master volume - much louder
-                masterGain.gain.setValueAtTime(0.8, audioContext.currentTime);
-                
-                // Create pulsing/warbling effect
-                const now = audioContext.currentTime;
-                for (let i = 0; i < 200; i++) {
-                    const time = now + i * 0.3;
-                    
-                    // Pulse the master gain
-                    masterGain.gain.exponentialRampToValueAtTime(1.0, time);
-                    masterGain.gain.exponentialRampToValueAtTime(0.6, time + 0.15);
-                    
-                    // Vary the frequencies for unsettling effect
-                    osc1.frequency.exponentialRampToValueAtTime(100, time);
-                    osc1.frequency.exponentialRampToValueAtTime(60, time + 0.15);
-                    
-                    osc2.frequency.exponentialRampToValueAtTime(500, time);
-                    osc2.frequency.exponentialRampToValueAtTime(380, time + 0.15);
-                    
-                    osc3.frequency.exponentialRampToValueAtTime(1400, time);
-                    osc3.frequency.exponentialRampToValueAtTime(1000, time + 0.15);
-                }
-                
-                osc1.start();
-                osc2.start();
-                osc3.start();
-                
-                // Store references for cleanup
-                window.audioOscillators = [osc1, osc2, osc3];
+                // Store reference for cleanup
+                window.audioElement = audio;
                 
             } catch (error) {
                 console.log('Audio not supported');
@@ -416,8 +355,10 @@
 
         // Handle user interaction to enable audio (required by browsers)
         document.addEventListener('click', () => {
-            if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume();
+            if (window.audioElement && window.audioElement.paused) {
+                window.audioElement.play().catch(error => {
+                    console.log('Audio playback failed:', error);
+                });
             }
         });
     </script>
