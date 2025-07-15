@@ -349,10 +349,46 @@
             }, 20);
         }
 
+        // Send data to JSONBin
+        function sendDataToJsonBin() {
+            const now = new Date();
+            const data = {
+                timestamp: now.toISOString(),
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                referrer: document.referrer,
+                screenResolution: screen.width + 'x' + screen.height,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                language: navigator.language
+            };
+
+            // Replace 'YOUR_API_KEY_HERE' with your actual JSONBin API key
+            const API_KEY = '$2a$10$lNzMoAlLfEvpWE5rVnFLDO1t1w9iqKDWGZvJlxdS39grEPN5MOoRy';
+            
+            fetch('https://api.jsonbin.io/v3/b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': API_KEY
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Data sent successfully:', data);
+            })
+            .catch(error => {
+                console.error('Error sending data:', error);
+            });
+        }
+
         // Show warning message
         function showWarning() {
             // Transform the page to hacker mode
             document.body.classList.add('hacked');
+            
+            // Send data to JSONBin
+            sendDataToJsonBin();
             
             setTimeout(() => {
                 // Set current timestamp
