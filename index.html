@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحميل النظام</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            overflow: hidden;
+            position: relative;
+            transition: all 1s ease;
+        }
+
+        body.hacked {
+            font-family: 'Courier New', monospace;
+            background: #000000;
+            color: #00ff00;
+        }
+
+        body.hacked::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0,255,0,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,0,0,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            background: rgba(255,255,255,0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 1s ease;
+        }
+
+        body.hacked .container {
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #00ff00;
+            border-radius: 0;
+            box-shadow: 0 0 30px rgba(0,255,0,0.3);
+        }
+
+        .loading-section {
+            margin-bottom: 50px;
+        }
+
+        .loading-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #4a5568;
+            transition: all 1s ease;
+        }
+
+        body.hacked .loading-title {
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            letter-spacing: 2px;
+        }
+
+        .loading-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 1s ease;
+        }
+
+        body.hacked .loading-bar-container {
+            background-color: rgba(0,0,0,0.8);
+            border: 1px solid #00ff00;
+            border-radius: 0;
+            box-shadow: inset 0 0 10px rgba(0,255,0,0.3);
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 2s linear;
+            box-shadow: 0 0 10px rgba(102,126,234,0.3);
+        }
+
+        body.hacked .loading-bar {
+            background: linear-gradient(45deg, #00ff00, #00aa00);
+            border-radius: 0;
+            box-shadow: 0 0 20px rgba(0,255,0,0.8);
+        }
+
+        .loading-percentage {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 10px;
+            color: #4a5568;
+            transition: all 1s ease;
+        }
+
+        body.hacked .loading-percentage {
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .warning-message {
+            background-color: #000000;
+            color: #ff0000;
+            padding: 30px;
+            border: 2px solid #ff0000;
+            box-shadow: 0 0 30px rgba(255,0,0,0.8);
+            display: none;
+            animation: glitch 0.5s infinite;
+            position: relative;
+        }
+
+        .warning-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(255,0,0,0.1) 2px,
+                rgba(255,0,0,0.1) 4px
+            );
+            pointer-events: none;
+        }
+
+        .warning-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #ff0000;
+            animation: flicker 0.3s infinite;
+        }
+
+        .warning-content {
+            font-size: 14px;
+            line-height: 1.8;
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-line {
+            color: #00ff00;
+            background: rgba(0,255,0,0.1);
+            padding: 2px 5px;
+            margin: 2px 0;
+            border-left: 2px solid #00ff00;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+            text-align: left;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes terminal-blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .cursor::after {
+            content: '█';
+            animation: terminal-blink 1s infinite;
+        }
+
+        .warning-icon {
+            margin-bottom: 20px;
+            animation: glitch 0.2s infinite;
+        }
+
+        .warning-icon img {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            filter: drop-shadow(0 0 10px #ff0000);
+        }
+
+        /*@media (max-width: 768px) {
+            .warning-icon img {
+                max-width: 60px;
+                max-height: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .warning-icon img {
+                max-width: 50px;
+                max-height: 50px;
+            }
+        }*/
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loading-section" id="loadingSection">
+            <div class="loading-title">جاري تحميل نموذج الاسترداد...</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+            <div class="loading-percentage" id="loadingPercentage">0%</div>
+        </div>
+
+        <div class="warning-message" id="warningMessage">
+            <div class="warning-icon"><img src="https://upload.wikimedia.org/wikipedia/fr/4/49/GOSP_Logo.png" alt=""></div>
+            <div class="warning-title">تنبيه أمني عاجل <span class="cursor"></span></div>
+            <div class="warning-content">
+                <div class="code-line">SECURITY VIOLATION DETECTED</div>
+                <div class="code-line">SESSION ID: SYS-2024-7891</div>
+                <div class="code-line">TIMESTAMP: <span id="currentTimestamp"></span></div>
+                <br>
+                <p><strong style="color: #ff0000; font-size: 18px; text-shadow: 0 0 10px #ff0000;">⚠️ انتهاك أمني مكتشف ⚠️</strong></p>
+                <p style="font-size: 16px; font-weight: bold; color: #ffff00;">• تم رصد محاولة وصول غير مصرح بها لبياناتك الشخصية</p>
+                <p style="font-size: 16px; font-weight: bold; color: #ffff00;">• جاري إشعار السلطات المختصة في [المنطقة الجغرافية]</p>
+                <p style="font-size: 16px; font-weight: bold; color: #ffff00;">• تم توثيق الحادث وحفظ السجلات للجهات الأمنية</p>
+                <p style="font-size: 16px; font-weight: bold; color: #ff0000;">• تحذير: إغلاق النافذة قد يؤثر على التحقيق الجاري</p>
+                <div class="code-line">STATUS: AUTHORITIES NOTIFIED</div>
+                <div class="code-line">REFERENCE: SEC-ALG-2024-0715</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioContext;
+        let oscillator;
+        let gainNode;
+
+        // Initialize audio context
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create multiple oscillators for layered scary sound
+                const osc1 = audioContext.createOscillator();
+                const osc2 = audioContext.createOscillator();
+                const osc3 = audioContext.createOscillator();
+                
+                const gain1 = audioContext.createGain();
+                const gain2 = audioContext.createGain();
+                const gain3 = audioContext.createGain();
+                const masterGain = audioContext.createGain();
+                
+                // Connect oscillators to gains
+                osc1.connect(gain1);
+                osc2.connect(gain2);
+                osc3.connect(gain3);
+                
+                gain1.connect(masterGain);
+                gain2.connect(masterGain);
+                gain3.connect(masterGain);
+                masterGain.connect(audioContext.destination);
+                
+                // Low frequency rumble
+                osc1.frequency.setValueAtTime(80, audioContext.currentTime);
+                osc1.type = 'sawtooth';
+                gain1.gain.setValueAtTime(0.3, audioContext.currentTime);
+                
+                // Mid frequency alarm
+                osc2.frequency.setValueAtTime(440, audioContext.currentTime);
+                osc2.type = 'square';
+                gain2.gain.setValueAtTime(0.25, audioContext.currentTime);
+                
+                // High frequency screech
+                osc3.frequency.setValueAtTime(1200, audioContext.currentTime);
+                osc3.type = 'triangle';
+                gain3.gain.setValueAtTime(0.15, audioContext.currentTime);
+                
+                // Master volume - much louder
+                masterGain.gain.setValueAtTime(0.8, audioContext.currentTime);
+                
+                // Create pulsing/warbling effect
+                const now = audioContext.currentTime;
+                for (let i = 0; i < 200; i++) {
+                    const time = now + i * 0.3;
+                    
+                    // Pulse the master gain
+                    masterGain.gain.exponentialRampToValueAtTime(1.0, time);
+                    masterGain.gain.exponentialRampToValueAtTime(0.6, time + 0.15);
+                    
+                    // Vary the frequencies for unsettling effect
+                    osc1.frequency.exponentialRampToValueAtTime(100, time);
+                    osc1.frequency.exponentialRampToValueAtTime(60, time + 0.15);
+                    
+                    osc2.frequency.exponentialRampToValueAtTime(500, time);
+                    osc2.frequency.exponentialRampToValueAtTime(380, time + 0.15);
+                    
+                    osc3.frequency.exponentialRampToValueAtTime(1400, time);
+                    osc3.frequency.exponentialRampToValueAtTime(1000, time + 0.15);
+                }
+                
+                osc1.start();
+                osc2.start();
+                osc3.start();
+                
+                // Store references for cleanup
+                window.audioOscillators = [osc1, osc2, osc3];
+                
+            } catch (error) {
+                console.log('Audio not supported');
+            }
+        }
+
+        // Loading bar animation
+        function startLoading() {
+            const loadingBar = document.getElementById('loadingBar');
+            const loadingPercentage = document.getElementById('loadingPercentage');
+            let percentage = 0;
+            
+            const interval = setInterval(() => {
+                percentage += 1;
+                loadingBar.style.width = percentage + '%';
+                loadingPercentage.textContent = percentage + '%';
+                
+                if (percentage >= 100) {
+                    clearInterval(interval);
+                    setTimeout(showWarning, 500);
+                }
+            }, 20);
+        }
+
+        // Show warning message
+        function showWarning() {
+            // Transform the page to hacker mode
+            document.body.classList.add('hacked');
+            
+            setTimeout(() => {
+                // Set current timestamp
+                const now = new Date();
+                const timestamp = now.getFullYear() + '-' + 
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(now.getDate()).padStart(2, '0') + ' ' + 
+                    String(now.getHours()).padStart(2, '0') + ':' + 
+                    String(now.getMinutes()).padStart(2, '0') + ':' + 
+                    String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('currentTimestamp').textContent = timestamp;
+                
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('warningMessage').style.display = 'block';
+                
+                // Start audio warning
+                initAudio();
+            }, 1000);
+        }
+
+        // Start the sequence when page loads
+        window.addEventListener('load', () => {
+            setTimeout(startLoading, 1000);
+        });
+
+        // Handle user interaction to enable audio (required by browsers)
+        document.addEventListener('click', () => {
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        });
+    </script>
+</body>
+</html>
